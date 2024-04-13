@@ -15,26 +15,26 @@ int main(int argc, char *argv[])
     printf("\nDigite el nombre de la conversación a eliminar: \n");
     scanf("%s", nomConv);
 
-    DIR *dir = opendir("/dev/shm");
-    if (dir == NULL)
+    DIR *ruta = opendir("/dev/shm");
+    if (ruta == NULL)
     {
         perror("opendir");
         return 1;
     }
 
-    struct dirent *entry;
+    struct dirent *acceso;
     int found = 0;
-    while ((entry = readdir(dir)) != NULL)
+    while ((acceso = readdir(ruta)) != NULL)
     {
-        if (strcmp(entry->d_name, nomConv) == 0)
+        if (strcmp(acceso->d_name, nomConv) == 0)
         {
             found = 1;
             // Formar el path completo del archivo en memoria compartida
-            char path[256] = "/dev/shm/";
-            strcat(path, nomConv);
+            char rutaF[256] = "/dev/shm/";
+            strcat(rutaF, nomConv);
 
             // Obtener el descriptor del archivo de memoria compartida
-            int fd = open(path, O_RDWR);
+            int fd = open(rutaF, O_RDWR);
             if (fd == -1)
             {
                 perror("open");
@@ -50,7 +50,6 @@ int main(int argc, char *argv[])
                 printf("unlink: %s\n", strerror(errno));
                 return 100;
             }
-
             printf("Se encontró y eliminó la conversación %s\n", nomConv);
             break; // Salir del bucle una vez que se haya encontrado el elemento
         }
@@ -61,7 +60,7 @@ int main(int argc, char *argv[])
         printf("No se encontró la conversación %s\n", nomConv);
     }
 
-    closedir(dir);
+    closedir(ruta);
 
     return 0;
 }
